@@ -6,5 +6,6 @@ type User struct {
 }
 
 type UserService interface {
-	CreateUser(u *User)
+	CreateUser(u *User) []*User
+	GetAllUsers() []*User
 }

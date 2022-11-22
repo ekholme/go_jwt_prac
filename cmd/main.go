@@ -1,17 +1,22 @@
 package main
 
 import (
-	"net/http"
-
+	"github.com/ekholme/go_jwt_prac/srvr"
+	"github.com/ekholme/go_jwt_prac/store"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"hello": "world"})
-	})
+	router := gin.Default()
 
-	r.Run(":8080")
+	as := store.NewAuthService()
+	us := store.NewUserService()
+	ah := srvr.NewAuthHandler(as, us)
+	uh := srvr.NewUserHandler(us)
+
+	s := srvr.NewServer(router, ah, uh, as)
+
+	s.Run()
+
 }

@@ -1,29 +1,33 @@
 package store
 
 import (
-	"errors"
-
 	jwt_prac "github.com/ekholme/go_jwt_prac"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type userService struct{}
+type userService struct {
+	Users []*jwt_prac.User
+}
 
 // initiate service
 func NewUserService() jwt_prac.UserService {
-	return &userService{}
+	return &userService{
+		Users: nil,
+	}
 }
 
 // method to create a user
-func (user *userService) CreateUser(u *jwt_prac.User, s []*jwt_prac.User) []*jwt_prac.User {
-	res := append(s, u)
+func (us *userService) CreateUser(u *jwt_prac.User) []*jwt_prac.User {
+	res := append(us.Users, u)
 
 	return res
 }
 
-//some helper functions
+func (us *userService) GetAllUsers() []*jwt_prac.User {
+	return us.Users
+}
 
-// first is a pw hash func
+// helper function to hash a password on registration
 func HashPw(u *jwt_prac.User) error {
 	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 
@@ -34,19 +38,4 @@ func HashPw(u *jwt_prac.User) error {
 	u.Password = string(hp)
 
 	return nil
-}
-
-// checking that a user exists in the slice of users
-func CheckUserExists(u *jwt_prac.User, s []*jwt_prac.User) (int, error) {
-	for k, v := range s {
-		if u.Username == v.Username {
-			return k, nil
-		}
-	}
-	return 0, errors.New("user doesn't exist")
-}
-
-// check that passwords match
-func CheckPwMatch(inp *jwt_prac.User, ex *jwt_prac.User) error {
-	//TODO
 }
